@@ -83,7 +83,54 @@ export default function Alunos() {
 
             <Pagination current={data.current} pageSize={data.pageSize} total={data.alunos.length} onChange={(page, size) => setData((d) => ({ ...d, current: page, pageSize: size }))} showSizeChanger pageSizeOptions={["5", "10", "100"]} />
 
-            <Image src="/images/loading.gif" width={300} height={200} alt="Loading" />
+            {data.loading ? (
+                <div className={styles.loadingContainer}>
+                    <Image src="/images/loading.gif" fill alt="Loading" />
+                </div>
+            ) : (
+                <div className={styles.cardsContainer}>
+                    {paginatedAlunos().map((aluno) => (
+                        <Card
+                            key={aluno.id}
+                            className={styles.card}
+                            hoverable
+                            onClick={() => openModal(aluno)}
+                            cover={<Image alt={aluno.name_estudante} src={aluno.photo ? aluno.photo : "https://via.placeholder.com/100x100.png"} width={100} height={100} />}
+                        >
+                            <Card.Meta title={aluno.name_estudante} description={`ID: ${aluno.id}`} />
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            <Modal
+                title={`Avaliação de ${modalInfo.aluno?.name_estudante}`}
+                open={modalInfo.visible}
+                onCancel={() => setModalInfo({ visible: false, aluno: null, avaliacao: null, loading: false })}
+                onOk={() => setModalInfo({ visible: false, aluno: null, avaliacao: null, loading: false })}
+                width={600}
+            >
+                {modalInfo.loading ? (
+                    <Skeleton active />
+                ) : modalInfo.avaliacao ? (
+                    <div className={styles.avaliacaoInfo}>
+                        <p>
+                            <span className={styles.label}>Nota:</span> {modalInfo.avaliacao.nota}
+                        </p>
+                        <p>
+                            <span className={styles.label}>Professor:</span> {modalInfo.avaliacao.professor}
+                        </p>
+                        <p>
+                            <span className={styles.label}>Matéria:</span> {modalInfo.avaliacao.materia}
+                        </p>
+                        <p>
+                            <span className={styles.label}>Sala:</span> {modalInfo.avaliacao.sala}
+                        </p>
+                    </div>
+                ) : (
+                    <p style={{ textAlign: "center" }}>Avaliação não encontrada.</p>
+                )}
+            </Modal>
 
             <ToastContainer position="top-right" autoClose={4500} />
         </div>
